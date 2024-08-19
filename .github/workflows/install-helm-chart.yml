@@ -38,4 +38,4 @@ jobs:
 
     - name: Deploy OpenTelemetry Collector
       run: |
-        k apply -f ./otel
+        kubectl apply -f ./otel
