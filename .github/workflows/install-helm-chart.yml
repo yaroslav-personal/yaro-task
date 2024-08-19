@@ -1,0 +1,19 @@
+name: Install Helm Chart
+
+on:
+  workflow_dispatch:
+
+jobs:
+  install-helm:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up helm repositories 
+      run: |
+        helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+        helm repo add grafana https://grafana.github.io/helm-charts
+        helm repo add jfrog https://charts.jfrog.io
+        helm repo update

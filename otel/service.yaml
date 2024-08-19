@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: otelcontribcol
+  namespace: yaro-task
+  labels:
+    app: otelcontribcol
+spec:
+  ports:
+  - name: otlp-grpc
+    port: 4317
+    protocol: TCP
+    targetPort: 4317
+  - name: loki
+    port: 3100
+    protocol: TCP
+    targetPort: 3100
+  - name: metrics
+    port: 5000
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: otelcontribcol
+  type: ClusterIP

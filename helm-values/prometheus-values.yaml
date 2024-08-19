@@ -1,0 +1,6 @@
+serverFiles:
+  prometheus.yml:
+    scrape_configs:
+    - job_name: 'otel-k8s'
+      static_configs:
+      - targets: ['otelcontribcol.yaro-task.svc.cluster.local:5000']
