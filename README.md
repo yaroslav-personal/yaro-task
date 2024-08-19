@@ -16,6 +16,7 @@ Github Action makes install of the following:
  - Grafana
  - Loki
  - JFrog
+ - OpenTelemetry Collector
 
 ## Manual steps after Deployment
 
