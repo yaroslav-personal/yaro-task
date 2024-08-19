@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: otelcontribcol
+  namespace: yaro-task
+  labels:
+    app: otelcontribcol
+spec:
+  selector:
+    matchLabels:
+      app: otelcontribcol
+  template:
+    metadata:
+      labels:
+        app: otelcontribcol
+    spec:
+      serviceAccountName: otelcontribcol
+      containers:
+      - name: otelcontribcol
+        image: otel/opentelemetry-collector-contrib
+        env:
+          - name: K8S_NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+        args: ["--config", "/etc/config/config.yaml"]
+        volumeMounts:
+        - name: config
+          mountPath: /etc/config
+        imagePullPolicy: IfNotPresent
+      volumes:
+        - name: config
+          configMap:
+            name: otelcontribcol

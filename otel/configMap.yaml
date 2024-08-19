@@ -1,0 +1,52 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otelcontribcol
+  namespace: yaro-task
+  labels:
+    app: otelcontribcol
+data:
+  config.yaml: |
+    receivers:
+      kubeletstats:
+        collection_interval: 10s
+        auth_type: 'serviceAccount'
+        endpoint: '${env:K8S_NODE_NAME}:10250'
+        insecure_skip_verify: true
+        metric_groups:
+          - container
+          - pod
+          - volume
+          - node      
+        metrics:
+          k8s.node.cpu.usage:
+            enabled: true
+          k8s.node.memory.available:
+            enabled: true
+          k8s.node.memory.usage:
+            enabled: true
+          k8s.pod.cpu.usage:
+            enabled: true
+          k8s.pod.memory.usage:
+            enabled: true
+
+    processors:
+      batch:
+        send_batch_size: 10000
+        timeout: 5s
+
+    exporters:
+      prometheus:
+        endpoint: "0.0.0.0:5000"
+        resource_to_telemetry_conversion:
+          enabled: true
+      logging:
+        loglevel: debug
+        
+    service:
+      pipelines:
+        metrics:
+          receivers: [kubeletstats]
+          processors: [batch]
+          exporters: [prometheus]

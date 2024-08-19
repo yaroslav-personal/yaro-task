@@ -1,0 +1,78 @@
+artifactory:
+  artifactory:
+    configMaps: |
+      config.yaml: |-
+        receivers:
+          filelog:
+            include: [ /var/opt/jfrog/artifactory/log/*.log ]
+            start_at: beginning
+        processors:
+          batch:
+            timeout: 10s
+        exporters:
+          loki:
+            endpoint: http://loki-yaro-gateway.yaro-task.svc.cluster.local/loki/api/v1/push
+        service:
+          pipelines:
+            logs:
+              receivers: [filelog]
+              processors: [batch]
+              exporters: [loki]
+
+    customSidecarContainers: |
+      - name: opentelemetry-collector-sidecar
+        image: otel/opentelemetry-collector-contrib
+        args: ["--config", "/etc/config/config.yaml"]
+        volumeMounts:
+        - mountPath: /var/opt/jfrog/artifactory/
+          name: artifactory-volume
+        - mountPath: /etc/config/config.yaml
+          name: artifactory-configmaps
+          subPath: config.yaml
+
+    # customVolumes: |
+    #   - name: fluentdb
+    #     emptyDir: {}
+        
+    image:
+      registry: releases-docker.jfrog.io
+      repository: jfrog/artifactory-oss
+
+    resources: {}
+    javaOpts: {}
+
+  installer:
+    platform: art-oss-helm
+  installerInfo: '{"productId":"Helm_artifactory-oss/{{ .Chart.Version }}","features":[{"featureId":"Platform/{{ printf "%s-%s" "kubernetes" .Capabilities.KubeVersion.Version }}"},{"featureId":"Database/{{ .Values.database.type }}"},{"featureId":"PostgreSQL_Enabled/{{ .Values.postgresql.enabled }}"},{"featureId":"Nginx_Enabled/{{ .Values.nginx.enabled }}"},{"featureId":"ArtifactoryPersistence_Type/{{ .Values.artifactory.persistence.type }}"},{"featureId":"SplitServicesToContainers_Enabled/{{ .Values.splitServicesToContainers }}"},{"featureId":"UnifiedSecretInstallation_Enabled/{{ .Values.artifactory.unifiedSecretInstallation }}"},{"featureId":"Filebeat_Enabled/{{ .Values.filebeat.enabled }}"},{"featureId":"ReplicaCount/{{ .Values.artifactory.replicaCount }}"}]}'
+
+  nginx:
+    enabled: true
+    tlsSecretName: ""
+    service:
+      type: NodePort #Changed as previously tested in minikube
+
+#   ingress:
+#     enabled: false
+#     tls:
+
+#   postgresql:
+#     enabled: true
+
+#   databaseUpgradeReady: "yes"
+
+#   jfconnect:
+#     enabled: false
+
+#   federation:
+#     enabled: false
+
+# postgresql:
+#   enabled: true
+
+# router:
+#   image:
+#     tag: 7.118.0
+
+# initContainers:
+#   image:
+#     tag: 9.4.949.1716471857
