@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  install-helm:
+  Deployment:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,3 +17,20 @@ jobs:
         helm repo add grafana https://grafana.github.io/helm-charts
         helm repo add jfrog https://charts.jfrog.io
         helm repo update
+    
+    - name: Configure kubectl
+      run: |
+        echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+
+    - name: Deploy Prometheus
+      run: |
+        helm upgrade --install --namespace yaro-task --create-namespace -f ./helm-values/prometheus-values.yaml prometheus-yaro prometheus-community/prometheus 
+
+    - name: Deploy Grafana and Loki
+      run: |
+        helm upgrade --install --namespace yaro-task --create-namespace grafana-yaro grafana/grafana
+        helm upgrade --install --namespace yaro-task --create-namespace -f ./helm-values/loki-values.yaml loki-yaro grafana/loki 
+
+    - name: Deploy Jfrog
+      run: |
+        helm upgrade --install --namespace yaro-task --create-namespace -f ./helm-values/jfrog-values.yaml artifactory-yaro jfrog/artifactory-oss
