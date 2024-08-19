@@ -35,3 +35,7 @@ jobs:
     - name: Deploy Jfrog
       run: |
         helm upgrade --install --namespace yaro-task --create-namespace -f ./helm-values/jfrog-values.yaml artifactory-yaro jfrog/artifactory-oss
+
+    - name: Deploy OpenTelemetry Collector
+      run: |
+        k apply -f ./otel
