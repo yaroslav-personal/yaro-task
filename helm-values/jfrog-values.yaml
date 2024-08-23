@@ -36,7 +36,7 @@ artifactory:
         
     image:
       registry: releases-docker.jfrog.io
-      repository: jfrog/artifactory-oss
+      repository: jfrog/artifactory-oss:7.90.7
 
     resources: {}
     javaOpts: {}
