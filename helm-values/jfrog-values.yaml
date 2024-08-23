@@ -49,7 +49,7 @@ artifactory:
     enabled: true
     tlsSecretName: ""
     service:
-      type: NodePort #Changed as previously tested in minikube
+      type: LoadBalancer #Changed as previously tested in minikube
 
 #   ingress:
 #     enabled: false
